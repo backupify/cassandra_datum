@@ -15,29 +15,23 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "cassandra_datum"
-  gem.homepage = "http://github.com/haruska/cassandra_datum"
+  gem.homepage = "http://github.com/backupify/cassandra_datum"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "jason@haruska.com"
+  gem.summary = %Q{Cassandra backed ORM}
+  gem.description = %Q{An active record like object base that is backed by Cassandra}
+  gem.email = "jason@backupify.com"
   gem.authors = ["Jason Haruska"]
   # dependencies defined in Gemfile
 end
-Jeweler::RubygemsDotOrgTasks.new
+
+#Uncomment to publish gem to rubygems (public)
+#Jeweler::RubygemsDotOrgTasks.new
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.pattern = 'test/**/*_test.rb'
   test.verbose = true
-end
-
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
 end
 
 task :default => :test
