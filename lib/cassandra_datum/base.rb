@@ -26,6 +26,8 @@ class Base
   DEFAULT_WALK_ROW_COUNT = 1000
   SINGLETON = 1
 
+  before_save :populate_type_if_exists
+
   def initialize_with_updated_at(*attr)
     # the OrderedHash returned by the cassandra client has a timestamps method which contains the write date of each column
     if attr.size > 0 && attr.first.respond_to?(:timestamps)
@@ -70,7 +72,10 @@ class Base
 
     res = cassandra_client.get(column_family, row_id, column_name)
 
-    res.blank? ? raise(ActiveRecord::RecordNotFound.new) : new(res)
+    raise ActiveRecord::RecordNotFound.new if res.blank?
+
+    datum_class = res['type'].present? ? res['type'].constantize : self
+    datum_class.new(res)
   end
 
   def self.find_by_key(key)
@@ -101,7 +106,10 @@ class Base
       row_id = options[:row_id].to_s
     end
 
-    result = cassandra_client.get(column_family, row_id, cass_options).collect { |k, v| new(v) }
+    result = cassandra_client.get(column_family, row_id, cass_options).collect do |k, v|
+      datum_class = v['type'].present? ? v['type'].constantize : self
+      datum_class.new(v)
+    end
 
     if options[:before_id]
       result.delete_at(0) if result.size > 0 && result[0].key == options[:before_id]
@@ -115,7 +123,10 @@ class Base
 
   # don't overuse this.  it crawls an entire row
   def self.find_each(row_id, options = {})
-    walk_row(row_id, options) { |k, v| yield new(v) }
+    walk_row(row_id, options) do |k, v|
+      datum_class = v['type'].present? ? v['type'].constantize : self
+      yield datum_class.new(v)
+    end
   end
 
   # don't overuse this.  it crawls an entire row
@@ -247,6 +258,10 @@ class Base
 
       break if last_start == start
     end
+  end
+
+  def populate_type_if_exists
+    self.type = self.class.name if self.respond_to?(:type=)
   end
 end
 end
