@@ -182,9 +182,7 @@ class BaseTest < Test::Unit::TestCase
 
         res = MockCassandraDatum.all(:row_id => @row_id)
 
-        res.each_with_index do |datum, i|
-          assert_datum_equal data[i], datum
-        end
+        assert_data_equal data, res
       end
 
     end

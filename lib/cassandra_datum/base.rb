@@ -74,8 +74,7 @@ class Base
 
     raise ActiveRecord::RecordNotFound.new if res.blank?
 
-    datum_class = res['type'].present? ? res['type'].constantize : self
-    datum_class.new(res)
+    initialize_datum res
   end
 
   def self.find_by_key(key)
@@ -107,8 +106,7 @@ class Base
     end
 
     result = cassandra_client.get(column_family, row_id, cass_options).collect do |k, v|
-      datum_class = v['type'].present? ? v['type'].constantize : self
-      datum_class.new(v)
+      initialize_datum v
     end
 
     if options[:before_id]
@@ -124,8 +122,7 @@ class Base
   # don't overuse this.  it crawls an entire row
   def self.find_each(row_id, options = {})
     walk_row(row_id, options) do |k, v|
-      datum_class = v['type'].present? ? v['type'].constantize : self
-      yield datum_class.new(v)
+      yield initialize_datum(v)
     end
   end
 
@@ -262,6 +259,11 @@ class Base
 
   def populate_type_if_exists
     self.type = self.class.name if self.respond_to?(:type=)
+  end
+
+  def self.initialize_datum(res)
+    datum_class = res['type'].present? ? res['type'].constantize : self
+    datum_class.new res
   end
 end
 end
