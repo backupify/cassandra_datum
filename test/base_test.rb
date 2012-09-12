@@ -28,6 +28,11 @@ class BaseTest < Test::Unit::TestCase
     assert_equal 'UTF-8', datum.payload.encoding.to_s
   end
 
+  should "populate type field if possible" do
+    datum = FactoryGirl.create(:polymorphic_cassandra_datum)
+    assert_equal datum.class.to_s, datum.type
+  end
+
   context 'save' do
     should 'save attributes to cassandra' do
       datum = FactoryGirl.create(:cassandra_datum)
@@ -122,35 +127,64 @@ class BaseTest < Test::Unit::TestCase
       @row_id = SecureRandom.hex(8)
     end
 
-    should 'find by key' do
-      datum = FactoryGirl.create(:cassandra_datum)
+    context 'find' do
 
-      doc = MockCassandraDatum.find(datum.key)
+      should 'find by key' do
+        datum = FactoryGirl.create(:cassandra_datum)
 
-      assert_datum_equal datum, doc
-    end
+        doc = MockCassandraDatum.find(datum.key)
 
-    should 'be sorted by timestamp in reverse order' do
-      data = 3.times.collect { |i| FactoryGirl.build(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now + i) }
-
-      data.shuffle!
-      data.each {|d| d.save! } #save in random order
-      data = data.sort_by(&:timestamp).reverse #reverse sort by timestamp
-
-      res = MockCassandraDatum.all(:row_id => @row_id)
-
-      3.times do |i|
-        assert_datum_equal data[i], res[i], "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
+        assert_datum_equal datum, doc
       end
+
+      should 'find by key, initialize polymorphically ' do
+        datum = FactoryGirl.create(:polymorphic_cassandra_datum)
+
+        # when we fetch with the base class, it should initialize an instance of the constantized :type attribute
+        doc = MockCassandraDatum.find(datum.key)
+
+        assert_datum_equal datum, doc
+        assert_instance_of PolymorphicCassandraDatum, doc
+      end
+
     end
 
-    should 'convert count option to integer' do
-      3.times.collect { |i| FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now + i) }
+    context 'all' do
 
-      res = MockCassandraDatum.all(:row_id => @row_id, :count => '2')
+      should 'be sorted by timestamp in reverse order' do
+        data = 3.times.collect { |i| FactoryGirl.build(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now + i) }
 
-      assert_equal 2, res.size
+        data.shuffle!
+        data.each {|d| d.save! } #save in random order
+        data = data.sort_by(&:timestamp).reverse #reverse sort by timestamp
+
+        res = MockCassandraDatum.all(:row_id => @row_id)
+
+        assert_data_equal data, res, "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
+      end
+
+      should 'convert count option to integer' do
+        3.times.collect { |i| FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now + i) }
+
+        res = MockCassandraDatum.all(:row_id => @row_id, :count => '2')
+
+        assert_equal 2, res.size
+      end
+
+      should 'honor polymorphic :type column' do
+        data = [
+            FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now),
+            FactoryGirl.create(:polymorphic_cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now - 1),
+            FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now - 2)
+        ]
+
+        res = MockCassandraDatum.all(:row_id => @row_id)
+
+        assert_data_equal data, res
+      end
+
     end
+
   end
 
   context "URL ID encoding" do

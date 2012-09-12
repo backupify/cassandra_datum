@@ -39,11 +39,18 @@ class OverrideColumnFamilyDatum < CassandraDatum::Base
   attribute :payload
 end
 
+class PolymorphicCassandraDatum < MockCassandraDatum
+  attribute :type, :type => String
+end
+
 FactoryGirl.define do
   factory :mock_cassandra_datum, :aliases => [:cassandra_datum] do
     row_id { SecureRandom.hex(8) }
     document_id { SecureRandom.hex(8) }
     timestamp { Time.now }
     sequence(:payload) { |n| "data payload #{n}" }
+  end
+
+  factory :polymorphic_cassandra_datum, :class => PolymorphicCassandraDatum, :parent => :cassandra_datum do
   end
 end
