@@ -166,7 +166,7 @@ class Base
       attrs = {}
 
       attributes.reject { |k, v| v.nil? }.each do |k, v|
-        attrs[k] = v.is_a?(Array) ? v.to_json : "#{v}"
+        attrs[k] = [Array, Hash].any?{ |collection_class| v.is_a?(collection_class) } ? v.to_json : "#{v}"
         attrs[k] = attrs[k].encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '').force_encoding('ASCII-8BIT')
       end
 

@@ -74,6 +74,17 @@ class BaseTest < Test::Unit::TestCase
       fetched_datum = MockCassandraDatum.find(datum.key)
       assert_equal 'my payload', fetched_datum.payload
     end
+
+    should 'convert arrays and hashes to json' do
+      array_value = ['some', 'values']
+      hash_value = { 'foo' => 'bar' }
+
+      datum = FactoryGirl.create(:datum_with_array_and_hash, :an_array => array_value, :a_hash => hash_value)
+
+      res = CASSANDRA_CLIENT.get(datum.class.column_family, datum.row_id, datum.column_name)
+      assert_equal array_value.to_json, res['an_array']
+      assert_equal hash_value.to_json, res['a_hash']
+    end
   end
 
 
