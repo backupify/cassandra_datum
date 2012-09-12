@@ -160,9 +160,7 @@ class BaseTest < Test::Unit::TestCase
 
         res = MockCassandraDatum.all(:row_id => @row_id)
 
-        3.times do |i|
-          assert_datum_equal data[i], res[i], "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
-        end
+        assert_data_equal data, res, "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
       end
 
       should 'convert count option to integer' do
