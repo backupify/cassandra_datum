@@ -43,6 +43,13 @@ class PolymorphicCassandraDatum < MockCassandraDatum
   attribute :type, :type => String
 end
 
+class DatumWithArrayAndHash < MockCassandraDatum
+  attribute :type, :type => String
+
+  attribute :a_hash, :type => Hash
+  attribute :an_array, :type => Array
+end
+
 FactoryGirl.define do
   factory :mock_cassandra_datum, :aliases => [:cassandra_datum] do
     row_id { SecureRandom.hex(8) }
@@ -53,4 +60,8 @@ FactoryGirl.define do
 
   factory :polymorphic_cassandra_datum, :class => PolymorphicCassandraDatum, :parent => :cassandra_datum do
   end
+
+  factory :datum_with_array_and_hash, :class => DatumWithArrayAndHash, :parent => :cassandra_datum do
+  end
+
 end
