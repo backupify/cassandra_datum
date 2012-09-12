@@ -137,7 +137,7 @@ class BaseTest < Test::Unit::TestCase
         assert_datum_equal datum, doc
       end
 
-      should 'find by key, initialize with STI' do
+      should 'find by key, initialize polymorphically ' do
         datum = FactoryGirl.create(:polymorphic_cassandra_datum)
 
         # when we fetch with the base class, it should initialize an instance of the constantized :type attribute
@@ -171,7 +171,7 @@ class BaseTest < Test::Unit::TestCase
         assert_equal 2, res.size
       end
 
-      should 'honor STI :type column' do
+      should 'honor polymorphic :type column' do
         data = [
             FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now),
             FactoryGirl.create(:polymorphic_cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now - 1),
