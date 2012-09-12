@@ -29,7 +29,7 @@ class BaseTest < Test::Unit::TestCase
   end
 
   should "populate type field if possible" do
-    datum = FactoryGirl.create(:sti_cassandra_datum)
+    datum = FactoryGirl.create(:polymorphic_cassandra_datum)
     assert_equal datum.class.to_s, datum.type
   end
 
@@ -138,13 +138,13 @@ class BaseTest < Test::Unit::TestCase
       end
 
       should 'find by key, initialize with STI' do
-        datum = FactoryGirl.create(:sti_cassandra_datum)
+        datum = FactoryGirl.create(:polymorphic_cassandra_datum)
 
         # when we fetch with the base class, it should initialize an instance of the constantized :type attribute
         doc = MockCassandraDatum.find(datum.key)
 
         assert_datum_equal datum, doc
-        assert_instance_of STICassandraDatum, doc
+        assert_instance_of PolymorphicCassandraDatum, doc
       end
 
     end
@@ -174,7 +174,7 @@ class BaseTest < Test::Unit::TestCase
       should 'honor STI :type column' do
         data = [
             FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now),
-            FactoryGirl.create(:sti_cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now - 1),
+            FactoryGirl.create(:polymorphic_cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now - 1),
             FactoryGirl.create(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now - 2)
         ]
 

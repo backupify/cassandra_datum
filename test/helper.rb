@@ -39,7 +39,7 @@ class OverrideColumnFamilyDatum < CassandraDatum::Base
   attribute :payload
 end
 
-class STICassandraDatum < MockCassandraDatum
+class PolymorphicCassandraDatum < MockCassandraDatum
   attribute :type, :type => String
 end
 
@@ -51,6 +51,6 @@ FactoryGirl.define do
     sequence(:payload) { |n| "data payload #{n}" }
   end
 
-  factory :sti_cassandra_datum, :class => STICassandraDatum, :parent => :cassandra_datum do
+  factory :polymorphic_cassandra_datum, :class => PolymorphicCassandraDatum, :parent => :cassandra_datum do
   end
 end
