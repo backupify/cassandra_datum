@@ -45,8 +45,3 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
-
-$LOAD_PATH << File.expand_path('./lib')
-
-require 'cassandra_datum'
-require 'cassandra_datum/tasks'
