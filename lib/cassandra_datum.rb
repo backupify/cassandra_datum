@@ -1,4 +1,5 @@
 require 'cassandra_datum/base'
+require 'cassandra_datum/railtie' if defined?(Rails)
 
 module CassandraDatum
 
