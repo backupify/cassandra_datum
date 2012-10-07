@@ -41,6 +41,8 @@ namespace :cassandra do
     ensure
       client.disconnect!
     end
+
+    true
   end
 
   task :migrate do
@@ -68,6 +70,7 @@ namespace :cassandra do
       client.disconnect!
     end
 
+    true
   end
 
 end
