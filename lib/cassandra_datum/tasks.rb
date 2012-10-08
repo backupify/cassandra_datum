@@ -3,7 +3,12 @@ namespace :cassandra do
   # TODO (davebenvenuti 10/4/12) these tasks should use the hosts field from configuration, but we need to figure out a way to deal with the embedded ruby first
 
   task :reset do
-    Rake::Task['cassandra:drop'].invoke rescue nil # the keyspace may not exist
+    begin
+      Rake::Task['cassandra:drop'].invoke
+    rescue Thrift::Exception => e
+      puts "ignoring thrift exception #{e} (keyspace probably doesn't exist)"
+    end
+
     Rake::Task['cassandra:create'].invoke
     Rake::Task['cassandra:migrate'].invoke
   end
@@ -11,12 +16,19 @@ namespace :cassandra do
   task :drop do
     client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
 
-    keyspace_name = CassandraDatum.configuration['keyspace']
-
     begin
       puts "Dropping keyspace #{keyspace_name}..."
 
-      client.drop_keyspace keyspace_name
+      with_thrift_timeout_retry do
+        client.drop_keyspace keyspace_name
+      end
+
+    rescue Thrift::Exception => e
+      if ENV['IGNORE_THRIFT_EXCEPTIONS']
+        puts "ignoring thrift exception #{e}"
+      else
+        raise e
+      end
     ensure
       client.disconnect!
     end
@@ -24,8 +36,6 @@ namespace :cassandra do
 
   task :create do
     client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
-
-    keyspace_name = CassandraDatum.configuration['keyspace']
 
     begin
       puts "Creating keyspace #{keyspace_name}..."
@@ -37,7 +47,16 @@ namespace :cassandra do
           :cf_defs => []
       })
 
-      client.add_keyspace keyspace_definition
+      with_thrift_timeout_retry do
+        client.add_keyspace keyspace_definition
+      end
+
+    rescue Thrift::Exception => e
+      if ENV['IGNORE_THRIFT_EXCEPTIONS']
+        puts "ignoring thrift exception #{e}"
+      else
+        raise e
+      end
     ensure
       client.disconnect!
     end
@@ -46,9 +65,10 @@ namespace :cassandra do
   end
 
   task :migrate do
-    keyspace_name = CassandraDatum.configuration['keyspace']
-    column_families = CassandraDatum.configuration['column_families']
     client = Cassandra.new keyspace_name, ["#{`hostname`.strip}:9160"]
+
+
+    # the migrate task needs a little more resilience with respect to timeouts and thrift errors.  we should try 3 times with a random sleep in between
 
     begin
       column_families.each do |cf|
@@ -60,10 +80,27 @@ namespace :cassandra do
                                        :keyspace => keyspace_name
         })
 
-        puts "Creating column family #{cf['name']}"
+        with_thrift_timeout_retry do
 
-        client.add_column_family cf_def
+          client.keyspace = keyspace_name # reloads the schema so the column_families are up to date
 
+          if client.column_families.has_key?(cf['name'])
+            puts "Skipping column family #{cf['name']}, already exsits"
+          else
+            puts "Creating column family #{cf['name']}"
+
+            client.add_column_family cf_def
+          end
+
+        end
+
+      end
+
+    rescue Thrift::Exception => e
+      if ENV['IGNORE_THRIFT_EXCEPTIONS']
+        puts "ignoring thrift exception #{e}"
+      else
+        raise e
       end
 
     ensure
@@ -71,6 +108,36 @@ namespace :cassandra do
     end
 
     true
+  end
+
+  def keyspace_name
+    CassandraDatum.configuration['keyspace']
+  end
+
+  def column_families
+    CassandraDatum.configuration['column_families']
+  end
+
+  def with_thrift_timeout_retry
+    max_tries = 3
+    current_try = 0
+
+    begin
+      yield
+    rescue CassandraThrift::Cassandra::Client::TransportException => e
+      if (current_try < max_tries) && (e.type =~ /Timed out reading/)
+        puts "Encountered thrift exception #{e}, retrying..."
+
+        sleep rand(5)
+
+        current_try += 1
+
+        retry
+      else
+        raise e
+      end
+    end
+
   end
 
 end
