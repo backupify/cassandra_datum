@@ -2,6 +2,7 @@ namespace :cassandra do
 
   # TODO (davebenvenuti 10/4/12) these tasks should use the hosts field from configuration, but we need to figure out a way to deal with the embedded ruby first
 
+  desc "Reset (Drop, Create, Remigrate) the Cassandra schema"
   task :reset do
     begin
       Rake::Task['cassandra:drop'].invoke
@@ -13,6 +14,7 @@ namespace :cassandra do
     Rake::Task['cassandra:migrate'].invoke
   end
 
+  desc "Drop the keyspace from Cassandra as defined in config/cassandra.yml"
   task :drop do
     client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
 
@@ -34,6 +36,7 @@ namespace :cassandra do
     end
   end
 
+  desc "Create the keyspace in Cassandra as defined in config/cassandra.yml"
   task :create do
     client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
 
@@ -64,6 +67,7 @@ namespace :cassandra do
     true
   end
 
+  desc "Create column families as defined in config/cassandra.yml"
   task :migrate do
     client = Cassandra.new keyspace_name, ["#{`hostname`.strip}:9160"]
 
