@@ -14,7 +14,7 @@ namespace :cassandra do
     Rake::Task['cassandra:migrate'].invoke
   end
 
-  desc "Drop the keyspace from Cassandra"
+  desc "Drop the keyspace from Cassandra as defined in config/cassandra.yml"
   task :drop do
     client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
 
@@ -36,7 +36,7 @@ namespace :cassandra do
     end
   end
 
-  desc "Create the keyspace in Cassandra"
+  desc "Create the keyspace in Cassandra as defined in config/cassandra.yml"
   task :create do
     client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
 
@@ -67,7 +67,7 @@ namespace :cassandra do
     true
   end
 
-  desc "Bring the keyspace up to date"
+  desc "Create column families as defined in config/cassandra.yml"
   task :migrate do
     client = Cassandra.new keyspace_name, ["#{`hostname`.strip}:9160"]
 
