@@ -23,16 +23,21 @@ module CassandraDatum
       def assert_datum_equal(datum1, datum2, explanation=nil)
         assert_equal datum1.row_id, datum2.row_id, explanation
         assert_equal datum1.column_name, datum2.column_name, explanation
-        assert_hashes_equal datum1.attributes, datum2.attributes, explanation
+        assert_attributes_equal datum1, datum2, explanation
       end
 
-      def assert_hashes_equal(hash1, hash2, explanation=nil)
-        assert_equal hash1.keys.size, hash2.keys.size, explanation
-        hash1.keys.each do |k|
-          if hash1[k].is_a? DateTime
-            assert_equal hash1[k].to_i, hash2[k].to_i, explanation
+      def assert_attributes_equal(datum1, datum2, explanation=nil)
+        assert_equal datum1.attributes.size, datum2.attributes.size, "different number of attributes"
+        datum1.attributes.keys.each do |attribute_name|
+          value1 = datum1.send(attribute_name)
+          value2 = datum2.send(attribute_name)
+
+          full_explanation = explanation.present? ? "#{attribute_name}: #{explanation}" : "datum1.#{attribute_name} != datum2.#{attribute_name}"
+
+          if value1.is_a?(Date)
+            assert_equal value1.to_i, value2.to_i, full_explanation
           else
-            assert_equal hash1[k], hash2[k], explanation
+            assert_equal value1, value2, full_explanation
           end
         end
       end
