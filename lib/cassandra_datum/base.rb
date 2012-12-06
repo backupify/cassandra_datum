@@ -151,6 +151,21 @@ class Base
     Base64.strict_encode64([row_id, column_name].join(':')).tr('+/', '-_')
   end
 
+  def encode_for_cassandra(str, opts = {})
+    CassandraDatum::Base.encode_for_cassandra(str, opts)
+  end
+
+  def self.encode_for_cassandra(str, opts = {})
+    encode_opts = {
+        :invalid => :replace,
+        :undef => :replace,
+        :replace => ''
+    }.merge(opts)
+
+    str.encode('UTF-8', encode_opts).force_encoding('ASCII-8BIT')
+  end
+
+
   def to_param
     self.key
   end
@@ -167,7 +182,7 @@ class Base
 
       attributes.reject { |k, v| v.nil? }.each do |k, v|
         attrs[k] = [Array, Hash].any?{ |collection_class| v.is_a?(collection_class) } ? v.to_json : "#{v}"
-        attrs[k] = attrs[k].encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '').force_encoding('ASCII-8BIT')
+        attrs[k] = encode_for_cassandra(attrs[k])
       end
 
       raise ActiveRecord::RecordInvalid.new(self) unless self.valid?
