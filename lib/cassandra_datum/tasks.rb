@@ -16,7 +16,7 @@ namespace :cassandra do
 
   desc "Drop the keyspace from Cassandra as defined in config/cassandra.yml"
   task :drop do
-    client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
+    client = Cassandra.new "system", ["#{`hostname`.strip}:9160"], { :connect_timeout => 1 }
 
     begin
       puts "Dropping keyspace #{keyspace_name}..."
@@ -38,7 +38,7 @@ namespace :cassandra do
 
   desc "Create the keyspace in Cassandra as defined in config/cassandra.yml"
   task :create do
-    client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]
+    client = Cassandra.new "system", ["#{`hostname`.strip}:9160"], { :connect_timeout => 1 }
 
     begin
       puts "Creating keyspace #{keyspace_name}..."
@@ -69,7 +69,7 @@ namespace :cassandra do
 
   desc "Create column families as defined in config/cassandra.yml"
   task :migrate do
-    client = Cassandra.new keyspace_name, ["#{`hostname`.strip}:9160"]
+    client = Cassandra.new keyspace_name, ["#{`hostname`.strip}:9160"], { :connect_timeout => 1 }
 
 
     # the migrate task needs a little more resilience with respect to timeouts and thrift errors.  we should try 3 times with a random sleep in between
