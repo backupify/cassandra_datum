@@ -144,7 +144,7 @@ class Base
   end
 
   def column_name
-    "#{document_id}~#{timestamp.to_i}".encode('UTF-8').force_encoding('ASCII-8BIT')
+    self.encode_for_cassandra("#{document_id}~#{timestamp.to_i}")
   end
 
   def key
