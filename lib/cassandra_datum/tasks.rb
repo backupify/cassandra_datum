@@ -38,7 +38,7 @@ namespace :cassandra do
 
   desc "Create the keyspace in Cassandra as defined in config/cassandra.yml"
   task :create do
-    client = Cassandra.new "system", ["#{`hostname`.strip}:9160"]. { :connect_timeout => 1 }
+    client = Cassandra.new "system", ["#{`hostname`.strip}:9160"], { :connect_timeout => 1 }
 
     begin
       puts "Creating keyspace #{keyspace_name}..."
