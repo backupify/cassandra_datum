@@ -16,6 +16,17 @@ class BaseTest < Test::Unit::TestCase
     assert_datum_equal datum, datum.reload
   end
 
+  should 'properly encode string' do
+    name = "No\u00eblle"
+
+    assert_equal "UTF-8", name.encoding.to_s
+
+    encoded_name = CassandraDatum::Base.encode_for_cassandra(name)
+
+    assert_equal "ASCII-8BIT", encoded_name.encoding.to_s
+    assert_equal name.encode('UTF-8').force_encoding('ASCII-8BIT'), encoded_name
+  end
+
   should "handle encodings" do
     enc = "\u20ACuro"
     assert_equal "UTF-8", enc.encoding.to_s
@@ -207,41 +218,41 @@ class BaseTest < Test::Unit::TestCase
       assert_equal @datum.key, @datum.to_param
     end
   end
-  
+
   context '#new_record?' do
     should 'be a new record before saving' do
       datum = FactoryGirl.build(:cassandra_datum)
-      
+
       assert datum.new_record?
     end
-  
+
     should 'not be a new record after saving' do
       datum = FactoryGirl.create(:cassandra_datum)
-  
+
       assert !datum.new_record?
     end
-  
+
     should 'not be a new record when coming from #find' do
       datum = FactoryGirl.create(:cassandra_datum)
       retrieved = MockCassandraDatum.find(*datum.key)
-  
+
       assert !retrieved.new_record?
     end
-  
+
     should 'not be a new record when coming from #all' do
       row_id = SecureRandom.uuid
       3.times { FactoryGirl.create(:cassandra_datum, :row_id => row_id) }
 
       retrieved = MockCassandraDatum.all(:row_id => row_id)
-  
+
       retrieved.each do |retrieved_datum|
         assert !retrieved_datum.new_record?
       end
     end
   end
-  
+
   context "find_each and find_each_key" do
-  
+
     setup do
       @row_id = SecureRandom.uuid
     end
