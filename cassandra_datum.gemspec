@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "cassandra_datum"
-  s.version = "0.0.6"
+  s.version = "0.0.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jason Haruska"]
-  s.date = "2012-10-22"
+  s.date = "2012-12-10"
   s.description = "An active record like object base that is backed by Cassandra"
   s.email = "jason@backupify.com"
   s.extra_rdoc_files = [
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/backupify/cassandra_datum"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.18"
+  s.rubygems_version = "1.8.23"
   s.summary = "Cassandra backed ORM"
 
   if s.respond_to? :specification_version then
