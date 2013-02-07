@@ -340,5 +340,26 @@ class BaseTest < Test::Unit::TestCase
     end
   end
 
+  should 'support observers' do
+    MockCassandraDatum.reset_before_save_counts!
+
+    datum = FactoryGirl.create(:cassandra_datum)
+
+    # see MockCassandraDatum definition in
+    assert_equal 1, MockCassandraDatum.before_save_counts[datum]
+  end
+
+  should 'support activerecord before/after callbacks' do
+    MockCassandraDatumObserver.reset_before_save_counts!
+
+    ActiveRecord::Base.observers = MockCassandraDatumObserver
+    ActiveRecord::Base.instantiate_observers
+
+    datum = FactoryGirl.create(:cassandra_datum)
+
+    # see MockCassandraDatumObserver definition in helper.rb
+    assert_equal 1, MockCassandraDatumObserver.before_save_counts[datum]
+  end
+
 end
 end

@@ -31,6 +31,20 @@ class MockCassandraDatum < CassandraDatum::Base
   attribute :payload
 
   validates_presence_of :timestamp
+
+  # Just to test before_save callback
+  before_save do |datum|
+    @@before_save_counts ||= {}
+    @@before_save_counts[datum].present? ? @@before_save_counts[datum] += 1 : @@before_save_counts[datum] = 1
+  end
+
+  def self.before_save_counts
+    @@before_save_counts
+  end
+
+  def self.reset_before_save_counts!
+    @@before_save_counts = {}
+  end
 end
 
 class OverrideColumnFamilyDatum < CassandraDatum::Base
@@ -48,6 +62,26 @@ class DatumWithArrayAndHash < MockCassandraDatum
 
   attribute :a_hash, :type => Hash
   attribute :an_array, :type => Array
+end
+
+require 'active_record'
+
+class MockCassandraDatumObserver < ActiveRecord::Observer
+  observe :mock_cassandra_datum
+
+  def before_save(datum)
+    @@before_save_counts ||= {}
+    @@before_save_counts[datum].present? ? @@before_save_counts[datum] += 1 : @@before_save_counts[datum] = 1
+  end
+
+  def self.before_save_counts
+    @@before_save_counts
+  end
+
+  def self.reset_before_save_counts!
+    @@before_save_counts = {}
+  end
+
 end
 
 FactoryGirl.define do
