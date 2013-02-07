@@ -224,18 +224,6 @@ class Base
   end
 
 
-  # ActiveResource::Observing does not install an alias_method for the save! method. This code is taken from the
-  # Observing module and does the same setup for save!
-  def save_with_notifications!(*args, &block)
-    notify_observers(:before_save)
-    if result = save_without_notifications!(*args, &block)
-      notify_observers(:after_save)
-    end
-    result
-  end
-
-  alias_method_chain(:save!, :notifications)
-
   def as_json(options={})
     options = {:only => self.class.accessor_names}.merge(options)
     self.include_root_in_json = false
