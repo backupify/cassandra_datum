@@ -11,7 +11,7 @@ module CassandraDatum
     #
     # After you delete a record, it will be automatically replicated to cassandra in the following format
     #
-    #   column_family will be 'deleted_records'
+    #   column_family will be 'DeletedRecords'
     #   row_id will be the same as table name, for example above it will be 'services'
     #   column_name is the removal timestamp in unix format, it looks like '1360754413'
     #   column_attributes will contain the active record attributes
