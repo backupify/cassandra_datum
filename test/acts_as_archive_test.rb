@@ -1,50 +1,28 @@
 require File.expand_path(File.dirname(__FILE__) + '/helper.rb')
 
 module CassandraDatum
-  class Model
-    def self.after_commit(options = {})
-    end
-
-    def self.table_name
-      "models"
-    end
-
-    def attributes
-      {
-        "attribute_name1" => "value1",
-        "attribute_name2" => "value2",
-        "attribute_name3" => "value3",
-      }
-    end
-
-    # include it after all base active record methods get defined
-    # we suppose that we include this module in derived class of ActiveRecord::Base
-    # so all methods defined above should be already defined in derived class
+  class TestModel < ActiveRecord::Base
     include CassandraDatum::ActsAsArchive
   end
 
   class ActsAsArchiveTest < Test::Unit::TestCase
-    context 'archive' do
-      setup do
-        @record = Model.new
-        @before_archive_time = Time.now
-        @record.archive
+    should 'archive record to cassandra after record destroying' do
+      record = TestModel.create(:title => "title", :description => "description")
+      record.destroy
 
-        @archived_records = Model.archived_after(@before_archive_time)
-        @deletion_timestamp = @archived_records.keys.first
-      end
+      # get list of archived records
+      archived_records = TestModel.archived_after(record.created_at)
 
-      should 'archive record and return it in archived_after response' do
-        assert_equal 1, @archived_records.size
-      end
+      # find the id of last archived record
+      id = archived_records.keys.last
 
-      should 'should archive all attributes correctly' do
-        archived_record = Model.archived_after(@before_archive_time)[@deletion_timestamp]
+      # get the last archived record
+      last_archived_record = archived_records[id]
 
-        assert_equal 'value1', archived_record['attribute_name1']
-        assert_equal 'value2', archived_record['attribute_name2']
-        assert_equal 'value3', archived_record['attribute_name3']
-      end
+      assert_equal 1, archived_records.size
+
+      assert_equal "title", last_archived_record['title']
+      assert_equal "description", last_archived_record['description']
     end
   end
 end

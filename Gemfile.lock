@@ -60,6 +60,7 @@ GEM
     shoulda-matchers (1.3.0)
       activesupport (>= 3.0.0)
     simple_uuid (0.2.0)
+    sqlite3 (1.3.6)
     thrift (0.8.0)
     thrift_client (0.8.1)
       thrift (~> 0.8.0)
@@ -80,3 +81,4 @@ DEPENDENCIES
   jeweler (~> 1.8.4)
   rdoc (~> 3.12)
   shoulda
+  sqlite3
