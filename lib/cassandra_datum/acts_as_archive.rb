@@ -27,7 +27,7 @@ module CassandraDatum
 
     module InstanceMethods
       def archive
-        archived_at = Helpers.current_time
+        archived_at = DateTime.current
         ::CassandraDatum::Base.cassandra_client.insert('DeletedRecords', self.class.table_name, {archived_at.to_i.to_s => self.attributes})
       end
     end
@@ -35,7 +35,7 @@ module CassandraDatum
     module ClassMethods
       def archived_after(time)
         start_at = time
-        finish_at = Helpers.current_time
+        finish_at = DateTime.current
         CassandraDatum::Base.cassandra_client.get('DeletedRecords', table_name, :start => start_at.to_i.to_s, :finish => finish_at.to_i.to_s)
       end
 
@@ -45,12 +45,6 @@ module CassandraDatum
             archive
           end
         end
-      end
-    end
-
-    module Helpers
-      def self.current_time
-        defined?(Rails) ? Time.zone.now : Time.now
       end
     end
   end
