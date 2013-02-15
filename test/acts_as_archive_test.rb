@@ -9,10 +9,6 @@ module CassandraDatum
       "models"
     end
 
-    include CassandraDatum::ActsAsArchive
-
-    acts_as_archive
-
     def attributes
       {
         "attribute_name1" => "value1",
@@ -20,6 +16,11 @@ module CassandraDatum
         "attribute_name3" => "value3",
       }
     end
+
+    # include it after all base active record methods get defined
+    # we suppose that we include this module in derived class of ActiveRecord::Base
+    # so all methods defined above should be already defined in derived class
+    include CassandraDatum::ActsAsArchive
   end
 
   class ActsAsArchiveTest < Test::Unit::TestCase

@@ -1,13 +1,12 @@
 module CassandraDatum
   module ActsAsArchive
+    extend ActiveSupport::Concern
     # The active record extension implements the archive functionality to cassandra database. After record get deleted
     # it replicates the copy of all attributes of that object to cassandra.
     #
     # Example of usage
     #   class Service < ActiveRecord::Base
     #     include CassandraDatum::ActsAsArchive
-    #
-    #     acts_as_archive
     #   end
     #
     # After you delete a record, it will be automatically replicated to cassandra in the following format
@@ -20,16 +19,17 @@ module CassandraDatum
     # If you want to get list of deleted services for some period of time you do
     #   Service.archived_after(7.days.ago)
 
-    def self.included(base)
-      base.extend ClassMethods
-      base.send :include, InstanceMethods
+    included do
+      class_eval do
+        after_commit :on => :destroy do
+          archive
+        end
+      end
     end
 
-    module InstanceMethods
-      def archive
-        archived_at = DateTime.current
-        ::CassandraDatum::Base.cassandra_client.insert('DeletedRecords', self.class.table_name, {archived_at.to_i.to_s => self.attributes})
-      end
+    def archive
+      archived_at = DateTime.current
+      ::CassandraDatum::Base.cassandra_client.insert('DeletedRecords', self.class.table_name, {archived_at.to_i.to_s => self.attributes})
     end
 
     module ClassMethods
@@ -37,14 +37,6 @@ module CassandraDatum
         start_at = time
         finish_at = DateTime.current
         CassandraDatum::Base.cassandra_client.get('DeletedRecords', table_name, :start => start_at.to_i.to_s, :finish => finish_at.to_i.to_s)
-      end
-
-      def acts_as_archive
-        class_eval do
-          after_commit :on => :destroy do
-            archive
-          end
-        end
       end
     end
   end
