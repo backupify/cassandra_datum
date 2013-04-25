@@ -96,6 +96,12 @@ class BaseTest < Test::Unit::TestCase
       assert_equal array_value.to_json, res['an_array']
       assert_equal hash_value.to_json, res['a_hash']
     end
+
+    should 'return self when save! is called' do
+      datum = FactoryGirl.build(:cassandra_datum)
+
+      assert_equal datum, datum.save!
+    end
   end
 
 

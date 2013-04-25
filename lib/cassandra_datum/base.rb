@@ -192,6 +192,8 @@ class Base
       # this value might be a tad different from the value in cassandra.  the only way to get the true updated_at value is to reload the datum
       @updated_at = DateTime.now
     end
+
+    self
   end
 
   def reload
