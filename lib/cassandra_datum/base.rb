@@ -187,7 +187,9 @@ class Base
 
       raise ActiveRecord::RecordInvalid.new(self) unless self.valid?
 
-      self.class.cassandra_client.insert(self.class.column_family, self.row_id, {self.column_name => attrs})
+      retry_on_failure(::Thrift::Exception, :retry_count => 3, :retry_sleep => 1) do
+        self.class.cassandra_client.insert(self.class.column_family, self.row_id, {self.column_name => attrs})
+      end
 
       # this value might be a tad different from the value in cassandra.  the only way to get the true updated_at value is to reload the datum
       @updated_at = DateTime.now
