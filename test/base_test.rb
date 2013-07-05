@@ -91,14 +91,20 @@ class BaseTest < Test::Unit::TestCase
       assert_equal 'my payload', fetched_datum.payload
     end
 
-    should 'retry on thrift exceptions 3 times during save' do
+    should 'retry on thrift exceptions at least 3 times during save' do
       datum = FactoryGirl.build(:cassandra_datum)
+      exception = ::Thrift::Exception.new({"error" => {"message" => "Thrift exception"}})
 
-      Cassandra.any_instance.expects(:insert)
-                            .raises(::Thrift::Exception.new({"error" => {"message" => "Thrift exception"}})).twice
-                            .then.returns(nil)
+      Cassandra.any_instance
+               .expects(:insert)
+               .times(3)
+               .raises(exception)
+               .then
+               .raises(exception)
+               .then
+               .returns(nil)
 
-      assert datum.save!
+      assert_nothing_raised { datum.save! }
     end
 
     should 'convert arrays and hashes to json' do
