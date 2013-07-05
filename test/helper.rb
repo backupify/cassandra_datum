@@ -10,6 +10,8 @@ end
 require 'test/unit'
 require 'shoulda'
 require 'factory_girl'
+require 'mocha/setup'
+require 'log4r'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
