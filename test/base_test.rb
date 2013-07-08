@@ -3,6 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/helper.rb')
 module CassandraDatum
 class BaseTest < Test::Unit::TestCase
 
+  def setup
+    # Define logger here as nil logger causes exceptions during retry on failure
+    CassandraDatum::Base.logger = Log4r::Logger.root
+  end
+
   should 'use timestamp long in column_name' do
     time = DateTime.now
     datum = FactoryGirl.create(:cassandra_datum, :timestamp => time)
@@ -84,6 +89,22 @@ class BaseTest < Test::Unit::TestCase
 
       fetched_datum = MockCassandraDatum.find(datum.key)
       assert_equal 'my payload', fetched_datum.payload
+    end
+
+    should 'retry on thrift exceptions at least 3 times during save' do
+      datum = FactoryGirl.build(:cassandra_datum)
+      exception = ::Thrift::Exception.new({"error" => {"message" => "Thrift exception"}})
+
+      Cassandra.any_instance
+               .expects(:insert)
+               .times(3)
+               .raises(exception)
+               .then
+               .raises(exception)
+               .then
+               .returns(nil)
+
+      assert_nothing_raised { datum.save! }
     end
 
     should 'convert arrays and hashes to json' do
