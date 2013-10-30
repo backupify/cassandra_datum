@@ -205,6 +205,17 @@ class BaseTest < Test::Unit::TestCase
         assert_data_equal data, res
       end
 
+      should 'honor the :reversed option' do
+        data = 3.times.collect { |i| FactoryGirl.build(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now + i) }
+
+        data.shuffle!
+        data.each {|d| d.save! } #save in random order
+        data = data.sort_by(&:timestamp) #sort by timestamp
+
+        res = MockCassandraDatum.all(:row_id => @row_id, :reversed => true)
+
+        assert_data_equal data, res, "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
+      end
     end
 
   end

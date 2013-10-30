@@ -93,6 +93,7 @@ class Base
 
     cass_options = {}
     cass_options[:count] = (options[:count] || DEFAULT_ALL_COUNT).to_i
+    cass_options[:reversed] = options[:reversed] if options[:reversed]
 
     if options[:before_id]
       row_id, cass_options[:start] = Base64.decode64(options[:before_id].tr('-_', '+/')).split(':', 2)
