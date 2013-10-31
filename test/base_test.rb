@@ -205,6 +205,26 @@ class BaseTest < Test::Unit::TestCase
         assert_data_equal data, res
       end
 
+      should 'honor the :reversed option' do
+        data = 3.times.collect { |i| FactoryGirl.build(:cassandra_datum, :row_id => @row_id, :timestamp => DateTime.now + i) }
+
+        data.shuffle!
+        data.each {|d| d.save! } #save in random order
+        data = data.sort_by(&:timestamp) #sort by timestamp
+
+        res = MockCassandraDatum.all(:row_id => @row_id, :reversed => true)
+
+        assert_data_equal data, res, "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
+      end
+
+      should 'not raise ArgumentError when any 2 (or all three) of :reversed, :before_id, :after_id are used' do
+        options = [:reversed, :before_id, :after_id]
+        options.combination(2) do |combination|
+          assert_raises(ArgumentError) { MockCassandraDatum.all(combination[0] => true, combination[1] => true)}
+        end
+
+        assert_raises(ArgumentError) { MockCassandraDatum.all(options[0] => true, options[1] => true, options[2] => true)}
+      end
     end
 
   end
