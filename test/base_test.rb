@@ -216,6 +216,15 @@ class BaseTest < Test::Unit::TestCase
 
         assert_data_equal data, res, "not sorted properly: #{res.collect(&:column_name)}.\n expected: #{data.collect(&:column_name)}"
       end
+
+      should 'not raise ArgumentError when any 2 (or all three) of :reversed, :before_id, :after_id are used' do
+        options = [:reversed, :before_id, :after_id]
+        options.combination(2) do |combination|
+          assert_raises(ArgumentError) { MockCassandraDatum.all(combination[0] => true, combination[1] => true)}
+        end
+
+        assert_raises(ArgumentError) { MockCassandraDatum.all(options[0] => true, options[1] => true, options[2] => true)}
+      end
     end
 
   end

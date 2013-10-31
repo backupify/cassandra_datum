@@ -85,28 +85,32 @@ class Base
 
   #will always return data in reverse chronological order
   # @option[row_id] the row_id to paginate through (optional if passing in a before_id or after_id)
+  # @option[reversed] return the results in reversed order (exclusive)
   # @option[before_id] return a page of data that occurs before this key (exclusive)
   # @option[after_id] return a page of data that occurs after this key (exclusive)
   # @option[count] limit the number of data returned (default 50)
   def self.all(options={})
     options.symbolize_keys! if options.respond_to?(:symbolize_keys!)
 
+    # Check options to make sure more than one exclusive key is not passed in
+    exclusive_keys = options.keys & [:reversed, :before_id, :after_id]
+    raise ArgumentError.new("Cannot use #{exclusive_keys} together.") if exclusive_keys.size > 1
+
     cass_options = {}
     cass_options[:count] = (options[:count] || DEFAULT_ALL_COUNT).to_i
 
-    if options[:before_id]
+    row_id = options[:row_id].to_s
+
+    if options[:reversed]
+      cass_options[:reversed] = true
+      cass_options[:start] = LAST_KEY
+    elsif options[:before_id]
       row_id, cass_options[:start] = Base64.decode64(options[:before_id].tr('-_', '+/')).split(':', 2)
       cass_options[:reversed] = true
       cass_options[:count] += 1
     elsif options[:after_id]
       row_id, cass_options[:start] = Base64.decode64(options[:after_id].tr('-_', '+/')).split(':', 2)
       cass_options[:count] += 1
-    elsif options[:reversed]
-      row_id = options[:row_id].to_s
-      cass_options[:reversed] = true
-      cass_options[:start] = LAST_KEY
-    elsif options[:row_id]
-      row_id = options[:row_id].to_s
     end
 
     result = cassandra_client.get(column_family, row_id, cass_options).collect do |k, v|
