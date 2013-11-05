@@ -358,6 +358,11 @@ class BaseTest < Test::Unit::TestCase
       assert_datum_equal datum, OverrideColumnFamilyDatum.find(datum.key)
       assert MockCassandraDatum.find(datum.key).present? #both objects are using the same column family
     end
+
+    should "not override column_family for any other classes" do
+      assert_equal 'OverrideCassandraData', OverrideDifferentColumnFamilyDatum.column_family
+      assert_equal 'MockCassandraData', MockCassandraDatum.column_family
+    end
   end
 
   should 'support observers' do

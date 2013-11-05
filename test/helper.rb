@@ -17,7 +17,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'cassandra_datum'
 require 'cassandra_datum/test_helper'
 
-::CASSANDRA_CLIENT = Cassandra.new('BackupifyMetadata_test', %w[localhost:9160])
+::CASSANDRA_CLIENT = Cassandra.new('BackupifyMetadata_test', %w[127.0.0.1:9160])
 
 class Test::Unit::TestCase
   include CassandraDatum::TestHelper
@@ -53,11 +53,17 @@ class OverrideColumnFamilyDatum < CassandraDatum::Base
   attribute :payload
 end
 
+class OverrideDifferentColumnFamilyDatum < CassandraDatum::Base
+  column_family 'OverrideCassandraData'
+end
+
 class PolymorphicCassandraDatum < MockCassandraDatum
+  column_family 'MockCassandraData'
   attribute :type, :type => String
 end
 
 class DatumWithArrayAndHash < MockCassandraDatum
+  column_family 'MockCassandraData'
   attribute :type, :type => String
 
   attribute :a_hash, :type => Hash
