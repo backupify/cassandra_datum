@@ -56,13 +56,11 @@ class Base
     new(*attr).tap(&:save!)
   end
 
-  @@column_family = nil
-
   def self.column_family(*name)
     if name.present?
-      @@column_family = name.first
+      @column_family = name.first
     else
-      @@column_family || model_name.plural.camelize
+      @column_family || model_name.plural.camelize
     end
   end
 
