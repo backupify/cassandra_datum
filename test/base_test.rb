@@ -44,6 +44,18 @@ class BaseTest < Test::Unit::TestCase
     assert_equal datum.class.to_s, datum.type
   end
 
+  should "not populate type field if type provided" do
+    datum = FactoryGirl.create(:polymorphic_cassandra_datum)
+    assert_equal datum.class.to_s, datum.type
+    
+    new_type = "DatumWithArrayAndHash"
+    
+    datum.type = new_type
+    datum.save!
+    
+    assert_equal new_type, datum.type
+  end
+  
   context 'save' do
     should 'save attributes to cassandra' do
       datum = FactoryGirl.create(:cassandra_datum)

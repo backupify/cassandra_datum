@@ -267,7 +267,7 @@ class Base
   end
 
   def populate_type_if_exists
-    self.type = self.class.name if self.respond_to?(:type=)
+    self.type = self.class.name if self.respond_to?(:type=) && self.type.blank?
   end
 
   def self.initialize_datum(res)
