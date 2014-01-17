@@ -1,4 +1,14 @@
 GIT
+  remote: git@github.com:twitter/cassandra.git
+  revision: e8ae67c903c2934ee4d0c0a2f8bb83baf89102da
+  specs:
+    cassandra (0.23.0)
+      json
+      rake
+      simple_uuid (~> 0.3)
+      thrift_client (~> 0.7, < 0.9)
+
+GIT
   remote: http://github.com/backupify/active_attr.git
   revision: 69951a36e62bc348b6d2c86ce50c1251ad709e34
   specs:
@@ -6,94 +16,86 @@ GIT
       activemodel (>= 3.0.2, < 4.1)
       activesupport (>= 3.0.2, < 4.1)
 
-GIT
-  remote: http://github.com/backupify/cassandra.git
-  revision: e66c55ebb61422db96546f2052c5701f6e8e5343
-  specs:
-    cassandra (0.12.2)
-      json
-      rake
-      simple_uuid (~> 0.2.0)
-      thrift_client (>= 0.7.0)
-
 GEM
   remote: http://rubygems.org/
   specs:
-    activemodel (3.2.14)
-      activesupport (= 3.2.14)
+    activemodel (3.2.16)
+      activesupport (= 3.2.16)
       builder (~> 3.0.0)
-    activerecord (3.2.14)
-      activemodel (= 3.2.14)
-      activesupport (= 3.2.14)
+    activerecord (3.2.16)
+      activemodel (= 3.2.16)
+      activesupport (= 3.2.16)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
-    activesupport (3.2.14)
+    activesupport (3.2.16)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
     addressable (2.3.5)
-    arel (3.0.2)
+    arel (3.0.3)
     builder (3.0.4)
     daemons (1.1.9)
+    descendants_tracker (0.0.3)
     eventmachine (1.0.3)
     exception_helper (0.1.2)
-    factory_girl (4.2.0)
+    factory_girl (4.3.0)
       activesupport (>= 3.0.0)
-    faraday (0.8.8)
-      multipart-post (~> 1.2.0)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
     git (1.2.6)
-    github_api (0.10.1)
-      addressable
-      faraday (~> 0.8.1)
+    github_api (0.11.1)
+      addressable (~> 2.3)
+      descendants_tracker (~> 0.0.1)
+      faraday (~> 0.8, < 0.10)
       hashie (>= 1.2)
-      multi_json (~> 1.4)
-      nokogiri (~> 1.5.2)
+      multi_json (>= 1.7.5, < 2.0)
+      nokogiri (~> 1.6.0)
       oauth2
     hashie (2.0.5)
-    highline (1.6.19)
-    httpauth (0.2.0)
-    i18n (0.6.5)
-    jeweler (1.8.7)
+    highline (1.6.20)
+    i18n (0.6.9)
+    jeweler (2.0.0)
       builder
-      bundler (~> 1.0)
+      bundler (>= 1.0)
       git (>= 1.2.5)
-      github_api (= 0.10.1)
+      github_api
       highline (>= 1.6.15)
-      nokogiri (= 1.5.10)
+      nokogiri (>= 1.5.10)
       rake
       rdoc
-    json (1.8.0)
-    jwt (0.1.8)
+    json (1.8.1)
+    jwt (0.1.10)
       multi_json (>= 1.5)
-    multi_json (1.7.9)
+    mini_portile (0.5.2)
+    multi_json (1.8.4)
     multi_xml (0.5.5)
-    multipart-post (1.2.0)
-    nokogiri (1.5.10)
-    oauth2 (0.9.2)
-      faraday (~> 0.8)
-      httpauth (~> 0.2)
-      jwt (~> 0.1.4)
-      multi_json (~> 1.0)
+    multipart-post (2.0.0)
+    nokogiri (1.6.1)
+      mini_portile (~> 0.5.0)
+    oauth2 (0.9.3)
+      faraday (>= 0.8, < 0.10)
+      jwt (~> 0.1.8)
+      multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
     rack (1.5.2)
-    rake (10.1.0)
-    rdoc (4.0.1)
+    rake (10.1.1)
+    rdoc (4.1.1)
       json (~> 1.4)
     shoulda (3.5.0)
       shoulda-context (~> 1.0, >= 1.0.1)
       shoulda-matchers (>= 1.4.1, < 3.0)
-    shoulda-context (1.1.5)
-    shoulda-matchers (2.3.0)
+    shoulda-context (1.1.6)
+    shoulda-matchers (2.5.0)
       activesupport (>= 3.0.0)
-    simple_uuid (0.2.0)
-    thin (1.5.1)
+    simple_uuid (0.4.0)
+    thin (1.6.1)
       daemons (>= 1.0.9)
-      eventmachine (>= 0.12.6)
+      eventmachine (>= 1.0.0)
       rack (>= 1.0.0)
-    thrift (0.9.1)
-    thrift_client (0.9.2)
-      thrift (~> 0.9.0)
-    tzinfo (0.3.37)
+    thrift (0.8.0)
+    thrift_client (0.8.4)
+      thrift (~> 0.8.0)
+    tzinfo (0.3.38)
 
 PLATFORMS
   ruby

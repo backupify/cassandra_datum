@@ -19,6 +19,8 @@ require 'cassandra_datum/test_helper'
 
 ::CASSANDRA_CLIENT = Cassandra.new('BackupifyMetadata_test', %w[127.0.0.1:9160])
 
+I18n.enforce_available_locales = false
+
 class Test::Unit::TestCase
   include CassandraDatum::TestHelper
 end
