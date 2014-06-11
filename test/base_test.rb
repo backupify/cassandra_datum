@@ -39,6 +39,14 @@ class BaseTest < Test::Unit::TestCase
     assert_equal 'UTF-8', datum.payload.encoding.to_s
   end
 
+  should "properly initialize datums with hashes and arrays" do
+    expected_hash = {'a' => 'b'}
+    expected_array = [1,2,3,4,5]
+    datum = DatumWithArrayAndHash.new(:a_hash => expected_hash.dup, :an_array => expected_array.dup)
+    assert_equal expected_hash, datum.a_hash
+    assert_equal expected_array, datum.an_array
+  end
+
   should "populate type field if possible" do
     datum = FactoryGirl.create(:polymorphic_cassandra_datum)
     assert_equal datum.class.to_s, datum.type
@@ -47,15 +55,15 @@ class BaseTest < Test::Unit::TestCase
   should "not populate type field if type provided" do
     datum = FactoryGirl.create(:polymorphic_cassandra_datum)
     assert_equal datum.class.to_s, datum.type
-    
+
     new_type = "DatumWithArrayAndHash"
-    
+
     datum.type = new_type
     datum.save!
-    
+
     assert_equal new_type, datum.type
   end
-  
+
   context 'save' do
     should 'save attributes to cassandra' do
       datum = FactoryGirl.create(:cassandra_datum)

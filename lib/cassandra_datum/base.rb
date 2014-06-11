@@ -42,7 +42,7 @@ class Base
     if attr.size > 0 && attr.first.is_a?(Hash)
       #careful not to trounce timestamps in Cassandra::OrderedHash
       timestamps = attr.first.is_a?(Cassandra::OrderedHash) ? attr.first.timestamps : nil
-      attr.first.each { |k, v| attr.first[k] = "#{v}".force_encoding('UTF-8') unless v.blank? }
+      attr.first.each { |k, v| attr.first[k] = encode_value(v) unless v.blank? }
       attr.first.instance_variable_set(:@timestamps, timestamps) if timestamps.present?
     end
 
@@ -238,6 +238,16 @@ class Base
 
   def new_record?
     self.updated_at.blank?
+  end
+
+  def encode_value(v)
+    case v
+    when Hash, Array
+      v = v.to_json
+    else
+      v = "#{v}"
+    end
+    v.force_encoding('UTF-8')
   end
 
   protected
