@@ -1,8 +1,8 @@
 source "http://rubygems.org"
 
-gem 'activesupport', '~> 3'
-gem 'activemodel', '~> 3'
-gem 'activerecord', '~> 3'
+gem 'activesupport', '~> 4'
+gem 'activemodel', '~> 4'
+gem 'activerecord', '~> 4'
 gem 'exception_helper'
 
 gem "cassandra", :git => "http://github.com/backupify/cassandra.git"

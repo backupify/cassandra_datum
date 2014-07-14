@@ -1,6 +1,6 @@
-require 'rails/railtie'
+require 'rails'
 
-module AppletonResque
+module CasandraDatum
   class Railtie < Rails::Railtie
 
     rake_tasks do
