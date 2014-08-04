@@ -40,7 +40,7 @@ class Base
     if attr.size > 0 && attr.first.is_a?(Hash)
       #careful not to trounce timestamps in Cassandra::OrderedHash
       timestamps = attr.first.is_a?(Cassandra::OrderedHash) ? attr.first.timestamps : nil
-      attr.first.each { |k, v| attr.first[k] = "#{v}".force_encoding('UTF-8') unless v.blank? }
+      attr.first.each { |k, v| attr.first[k] = encode_value(v) unless v.blank? }
       attr.first.instance_variable_set(:@timestamps, timestamps) if timestamps.present?
     end
 
@@ -54,13 +54,11 @@ class Base
     new(*attr).tap(&:save!)
   end
 
-  @@column_family = nil
-
   def self.column_family(*name)
     if name.present?
-      @@column_family = name.first
+      @column_family = name.first
     else
-      @@column_family || model_name.plural.camelize
+      @column_family || model_name.plural.camelize
     end
   end
 
@@ -242,6 +240,16 @@ class Base
     self.updated_at.blank?
   end
 
+  def encode_value(v)
+    case v
+    when Hash, Array
+      v = v.to_json
+    else
+      v = "#{v}"
+    end
+    v.force_encoding('UTF-8')
+  end
+
   protected
 
   # don't overuse this.  it crawls an entire row
@@ -269,7 +277,7 @@ class Base
   end
 
   def populate_type_if_exists
-    self.type = self.class.name if self.respond_to?(:type=)
+    self.type = self.class.name if self.respond_to?(:type=) && self.type.blank?
   end
 
   def self.initialize_datum(res)

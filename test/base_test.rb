@@ -39,14 +39,22 @@ module CassandraDatum
       assert_equal 'UTF-8', datum.payload.encoding.to_s
     end
 
+    should "properly initialize datums with hashes and arrays" do
+      expected_hash = {'a' => 'b'}
+      expected_array = [1,2,3,4,5]
+      datum = DatumWithArrayAndHash.new(:a_hash => expected_hash.dup, :an_array => expected_array.dup)
+      assert_equal expected_hash, datum.a_hash
+      assert_equal expected_array, datum.an_array
+    end
+  
     should "populate type field if possible" do
       datum = FactoryGirl.create(:polymorphic_cassandra_datum)
       assert_equal datum.class.to_s, datum.type
     end
 
     context 'save' do
-      should 'save attributes to cassandra' do
-        datum = FactoryGirl.create(:cassandra_datum)
+    should 'save attributes to cassandra' do
+      datum = FactoryGirl.create(:cassandra_datum)
 
         cass_entry = MockCassandraDatum.find(datum.key)
 
@@ -337,34 +345,38 @@ module CassandraDatum
         ordered_hash = CASSANDRA_CLIENT.get(datum.class.column_family, datum.row_id, datum.column_name)
         expected_time = ordered_hash.timestamps.values.max / 1000000
 
-        datum = MockCassandraDatum.new(ordered_hash)
-        assert datum.updated_at.is_a?(DateTime)
-        assert_equal expected_time, datum.updated_at.to_time.to_i
-      end
-    end
-
-    context "column_family" do
-      should "default to the pluralization of the class name" do
-        assert_equal 'MockCassandraData', MockCassandraDatum.column_family
-      end
-
-      should "allow override in declaration" do
-        assert_equal 'MockCassandraData', OverrideColumnFamilyDatum.column_family
-        datum = OverrideColumnFamilyDatum.create :payload => 'mock payload'
-
         assert_datum_equal datum, OverrideColumnFamilyDatum.find(datum.key)
         assert MockCassandraDatum.find(datum.key).present? #both objects are using the same column family
       end
+  
+      should "not override column_family for any other classes" do
+        assert_equal 'OverrideCassandraData', OverrideDifferentColumnFamilyDatum.column_family
+        assert_equal 'MockCassandraData', MockCassandraDatum.column_family
+      end
+
+      context "column_family" do
+        should "default to the pluralization of the class name" do
+          assert_equal 'MockCassandraData', MockCassandraDatum.column_family
+        end
+  
+        should "allow override in declaration" do
+          assert_equal 'MockCassandraData', OverrideColumnFamilyDatum.column_family
+          datum = OverrideColumnFamilyDatum.create :payload => 'mock payload'
+  
+          assert_datum_equal datum, OverrideColumnFamilyDatum.find(datum.key)
+          assert MockCassandraDatum.find(datum.key).present? #both objects are using the same column family
+        end
+      end
+  
+      should 'support observers' do
+        MockCassandraDatum.reset_before_save_counts!
+  
+        datum = FactoryGirl.create(:cassandra_datum)
+  
+        # see MockCassandraDatum definition in
+        assert_equal 1, MockCassandraDatum.before_save_counts[datum]
+      end
+
     end
-
-    should 'support observers' do
-      MockCassandraDatum.reset_before_save_counts!
-
-      datum = FactoryGirl.create(:cassandra_datum)
-
-      # see MockCassandraDatum definition in
-      assert_equal 1, MockCassandraDatum.before_save_counts[datum]
-    end
-
   end
 end

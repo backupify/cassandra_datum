@@ -1,20 +1,20 @@
 GIT
+  remote: git@github.com:twitter/cassandra.git
+  revision: e8ae67c903c2934ee4d0c0a2f8bb83baf89102da
+  specs:
+    cassandra (0.23.0)
+      json
+      rake
+      simple_uuid (~> 0.3)
+      thrift_client (~> 0.7, < 0.9)
+
+GIT
   remote: http://github.com/backupify/active_attr.git
   revision: 78cd2b17ee5e28650a339abe3b3286d871505c20
   specs:
     active_attr (0.8.2)
       activemodel (>= 3.0.2, < 4.1)
       activesupport (>= 3.0.2, < 4.1)
-
-GIT
-  remote: http://github.com/backupify/cassandra.git
-  revision: e66c55ebb61422db96546f2052c5701f6e8e5343
-  specs:
-    cassandra (0.12.2)
-      json
-      rake
-      simple_uuid (~> 0.2.0)
-      thrift_client (>= 0.7.0)
 
 GEM
   remote: http://rubygems.org/
@@ -82,6 +82,10 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
+    pry (0.10.0)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     rack (1.5.2)
     rake (10.3.2)
     rdoc (4.1.1)
@@ -116,6 +120,7 @@ DEPENDENCIES
   exception_helper
   factory_girl
   jeweler
+  pry
   rdoc
   shoulda
   thin
