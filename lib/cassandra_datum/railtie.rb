@@ -1,6 +1,6 @@
 require 'rails'
 
-module CasandraDatum
+module CassandraDatum
   class Railtie < Rails::Railtie
 
     rake_tasks do
