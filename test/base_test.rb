@@ -345,8 +345,9 @@ module CassandraDatum
         ordered_hash = CASSANDRA_CLIENT.get(datum.class.column_family, datum.row_id, datum.column_name)
         expected_time = ordered_hash.timestamps.values.max / 1000000
 
-        assert_datum_equal datum, OverrideColumnFamilyDatum.find(datum.key)
-        assert MockCassandraDatum.find(datum.key).present? #both objects are using the same column family
+        datum = MockCassandraDatum.new(ordered_hash)
+        assert datum.updated_at.is_a?(DateTime)
+        assert_equal expected_time, datum.updated_at.to_time.to_i
       end
   
       should "not override column_family for any other classes" do
