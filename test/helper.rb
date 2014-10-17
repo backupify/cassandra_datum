@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'bundler'
+
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e
@@ -72,14 +73,20 @@ class DatumWithArrayAndHash < MockCassandraDatum
   attribute :an_array, :type => Array
 end
 
-require 'active_record'
+require 'active_support/concern'
 
-class MockCassandraDatumObserver < ActiveRecord::Observer
-  observe :mock_cassandra_datum
+module MockCassandraDatumObserver
+  extend ActiveSupport::Concern
 
-  def before_save(datum)
+  included do
+    before_save :count_before_save
+  end
+
+  private
+
+  def count_before_save
     @@before_save_counts ||= {}
-    @@before_save_counts[datum].present? ? @@before_save_counts[datum] += 1 : @@before_save_counts[datum] = 1
+    @@before_save_counts[self].present? ? @@before_save_counts[self] += 1 : @@before_save_counts[self] = 1
   end
 
   def self.before_save_counts

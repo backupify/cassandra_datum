@@ -1,5 +1,4 @@
 require 'active_attr/model'
-require 'active_model/observing'
 require 'active_model/callbacks'
 require 'exception_helper/retry'
 require 'active_record/errors'
@@ -10,7 +9,6 @@ module CassandraDatum
 class Base
   include ActiveAttr::Model
 
-  include ActiveModel::Observing
   extend ActiveModel::Callbacks
 
   include ExceptionHelper::Retry
@@ -183,7 +181,7 @@ class Base
   end
 
   def save!
-    _run_save_callbacks do
+    run_callbacks :save do
       attrs = {}
 
       attributes.reject { |k, v| v.nil? }.each do |k, v|
@@ -205,7 +203,9 @@ class Base
   end
 
   def destroy
-    _run_destroy_callbacks { self.delete }
+    run_callbacks :destroy do
+      self.delete
+    end
   end
 
   def self.delete_all(row_id)
