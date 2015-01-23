@@ -5,7 +5,7 @@ gem 'activemodel', '~> 4'
 gem 'activerecord', '~> 4'
 gem 'exception_helper'
 
-gem 'twitter_cassandra', :git => 'git@github.com:backupify/cassandra.git', :branch => 'rename_root_namespace', :require => 'cassandra/1.2'
+gem 'twitter_cassandra', :git => 'git@github.com:backupify/twitter_cassandra.git', :branch => 'rename_root_namespace', :require => 'cassandra/1.2'
 gem 'active_attr', :git => "http://github.com/backupify/active_attr.git"
 
 # Add dependencies to develop your gem here.

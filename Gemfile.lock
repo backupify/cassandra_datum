@@ -7,7 +7,7 @@ GIT
       activesupport (>= 3.0.2, < 4.1)
 
 GIT
-  remote: git@github.com:backupify/cassandra.git
+  remote: git@github.com:backupify/twitter_cassandra.git
   revision: 173764d1a4546c3ff31b7d6b225995e9b776c01e
   branch: rename_root_namespace
   specs:
