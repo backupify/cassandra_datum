@@ -8,8 +8,7 @@ GIT
 
 GIT
   remote: git@github.com:backupify/twitter_cassandra.git
-  revision: 173764d1a4546c3ff31b7d6b225995e9b776c01e
-  branch: rename_root_namespace
+  revision: 8ee359a1c57fcd22cbcbe6a392b2b8d3240b84c3
   specs:
     twitter_cassandra (0.23.0)
       json
