@@ -213,7 +213,7 @@ class Base
   end
 
   def self.delete(row_id, *column_names)
-    column_names.flatten.each { |column_name| CASSANDRA_CLIENT.remove column_family, row_id, column_name }
+    column_names.flatten.each { |column_name| cassandra_client.remove column_family, row_id, column_name }
   end
 
   def delete
