@@ -1,12 +1,4 @@
 GIT
-  remote: http://github.com/backupify/active_attr.git
-  revision: 78cd2b17ee5e28650a339abe3b3286d871505c20
-  specs:
-    active_attr (0.8.2)
-      activemodel (>= 3.0.2, < 4.1)
-      activesupport (>= 3.0.2, < 4.1)
-
-GIT
   remote: git@github.com:backupify/twitter_cassandra.git
   revision: 8ee359a1c57fcd22cbcbe6a392b2b8d3240b84c3
   specs:
@@ -15,6 +7,14 @@ GIT
       rake
       simple_uuid (~> 0.3)
       thrift_client (~> 0.7, < 0.9)
+
+GIT
+  remote: http://github.com/backupify/active_attr.git
+  revision: 78cd2b17ee5e28650a339abe3b3286d871505c20
+  specs:
+    active_attr (0.8.2)
+      activemodel (>= 3.0.2, < 4.1)
+      activesupport (>= 3.0.2, < 4.1)
 
 GEM
   remote: http://rubygems.org/
