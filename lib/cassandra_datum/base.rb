@@ -1,9 +1,9 @@
 require 'active_attr/model'
 require 'active_model/callbacks'
-require 'exception_helper/retry'
 require 'active_record/errors'
 require 'active_record/validations'
 require 'twitter_cassandra'
+require 'cassandra_datum/cassandra_retry'
 
 module CassandraDatum
 class Base
@@ -11,7 +11,7 @@ class Base
 
   extend ActiveModel::Callbacks
 
-  include ExceptionHelper::Retry
+  include CassandraDatum::CassandraRetry
 
   define_model_callbacks :save
   define_model_callbacks :destroy
@@ -66,7 +66,10 @@ class Base
   def self.find(key)
     row_id, column_name = Base64.decode64(key.tr('-_', '+/')).split(':', 2)
 
-    res = cassandra_client.get(column_family, row_id, column_name)
+    res = nil
+    retry_cassandra_exceptions do
+      res = cassandra_client.get(column_family, row_id, column_name)
+    end
 
     raise ActiveRecord::RecordNotFound.new if res.blank?
 
@@ -109,8 +112,11 @@ class Base
       cass_options[:count] += 1
     end
 
-    result = cassandra_client.get(column_family, row_id, cass_options).collect do |k, v|
-      initialize_datum v
+    result = nil
+    retry_cassandra_exceptions do
+      result = cassandra_client.get(column_family, row_id, cass_options).collect do |k, v|
+        initialize_datum v
+      end
     end
 
     if options[:before_id]
@@ -191,7 +197,9 @@ class Base
 
       raise ActiveRecord::RecordInvalid.new(self) unless self.valid?
 
-      self.class.cassandra_client.insert(self.class.column_family, self.row_id, {self.column_name => attrs})
+      retry_cassandra_exceptions do
+        self.class.cassandra_client.insert(self.class.column_family, self.row_id, {self.column_name => attrs})
+      end
 
       # this value might be a tad different from the value in cassandra.  the only way to get the true updated_at value is to reload the datum
       @updated_at = DateTime.now
@@ -260,16 +268,17 @@ class Base
     last_start = nil
 
     loop do
-      retry_on_failure(::Thrift::Exception, :retry_count => 5, :retry_sleep => 10) do
-        last_start = start
+      last_start = start
 
+      res = []
+      retry_cassandra_exceptions(:retry_count => 5, :retry_sleep => 10) do
         res = cassandra_client.get(column_family, row_id, options.merge(:start => start))
+      end
 
-        res.each do |k, v|
-          next if k == last_start # ignore the first result we get back.  since start is the last record in the previous get, it'll always be off by 1
-          start = k
-          yield [k, v]
-        end
+      res.each do |k, v|
+        next if k == last_start # ignore the first result we get back.  since start is the last record in the previous get, it'll always be off by 1
+        start = k
+        yield [k, v]
       end
 
       break if last_start == start
