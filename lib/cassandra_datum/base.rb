@@ -3,7 +3,6 @@ require 'active_model/callbacks'
 require 'active_record/errors'
 require 'active_record/validations'
 require 'twitter_cassandra'
-require 'cassandra_datum/cassandra_retry'
 
 module CassandraDatum
 class Base
@@ -11,7 +10,10 @@ class Base
 
   extend ActiveModel::Callbacks
 
-  include CassandraDatum::CassandraRetry
+  class << self
+    include RemotelyExceptional::RemoteHandling
+  end
+  include RemotelyExceptional::RemoteHandling
 
   define_model_callbacks :save
   define_model_callbacks :destroy
@@ -67,7 +69,7 @@ class Base
     row_id, column_name = Base64.decode64(key.tr('-_', '+/')).split(':', 2)
 
     res = nil
-    retry_cassandra_exceptions do
+    remotely_exceptional(CassandraDatum::RemoteExceptionHandler) do
       res = cassandra_client.get(column_family, row_id, column_name)
     end
 
@@ -113,7 +115,7 @@ class Base
     end
 
     result = nil
-    retry_cassandra_exceptions do
+    remotely_exceptional(CassandraDatum::RemoteExceptionHandler) do
       result = cassandra_client.get(column_family, row_id, cass_options).collect do |k, v|
         initialize_datum v
       end
@@ -197,7 +199,7 @@ class Base
 
       raise ActiveRecord::RecordInvalid.new(self) unless self.valid?
 
-      retry_cassandra_exceptions do
+      remotely_exceptional(CassandraDatum::RemoteExceptionHandler) do
         self.class.cassandra_client.insert(self.class.column_family, self.row_id, {self.column_name => attrs})
       end
 
@@ -271,7 +273,7 @@ class Base
       last_start = start
 
       res = []
-      retry_cassandra_exceptions(:retry_count => 5, :retry_sleep => 10) do
+      remotely_exceptional(CassandraDatum::RemoteExceptionHandler) do
         res = cassandra_client.get(column_family, row_id, options.merge(:start => start))
       end
 

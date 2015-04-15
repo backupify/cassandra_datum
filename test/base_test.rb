@@ -53,8 +53,8 @@ module CassandraDatum
     end
 
     context 'save' do
-    should 'save attributes to cassandra' do
-      datum = FactoryGirl.create(:cassandra_datum)
+      should 'save attributes to cassandra' do
+        datum = FactoryGirl.create(:cassandra_datum)
 
         cass_entry = MockCassandraDatum.find(datum.key)
 
@@ -63,6 +63,15 @@ module CassandraDatum
         cass_entry.attributes.each do |k, v|
           assert !v.nil?
           assert_equal v, datum.send(k).to_s
+        end
+      end
+
+      should 'retry Thrift errors 10 times by default' do
+        datum = FactoryGirl.create(:cassandra_datum)
+        CASSANDRA_CLIENT.expects(:get).times(5).raises(::Thrift::Exception.new("Boom"))
+        CASSANDRA_CLIENT.expects(:get).times(5).raises(::ThriftClient::NoServersAvailable)
+        assert_raises(::Thrift::Exception) do
+          MockCassandraDatum.find(datum.key)
         end
       end
 
