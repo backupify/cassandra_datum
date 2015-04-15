@@ -25,7 +25,4 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency(%q<twitter_cassandra>, [">= 0"])
   gem.add_runtime_dependency(%q<active_attr>, [">= 0"])
   gem.add_runtime_dependency(%q<exception_helper>, [">= 0"])
-
-  gem.add_development_dependency(%q<shoulda>, [">= 0"])
-  gem.add_development_dependency(%q<factory_girl>, [">= 0"])
 end

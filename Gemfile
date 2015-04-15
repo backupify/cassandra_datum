@@ -7,8 +7,10 @@ gem "active_attr", :git => "http://github.com/backupify/active_attr.git"
 
 group :development do
   gem "bundler"
+  gem "factory_girl"
   gem "jeweler"
   gem "pry"
   gem "rdoc"
+  gem "shoulda"
   gem "thin"
 end
