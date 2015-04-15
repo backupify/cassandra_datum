@@ -16,6 +16,17 @@ GIT
       activemodel (>= 3.0.2, < 4.1)
       activesupport (>= 3.0.2, < 4.1)
 
+PATH
+  remote: .
+  specs:
+    cassandra_datum (0.0.14)
+      active_attr
+      activemodel (>= 2.3.5)
+      activerecord (>= 2.3.5)
+      activesupport (>= 2.3.5)
+      exception_helper
+      twitter_cassandra
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -27,7 +38,7 @@ GEM
       activerecord-deprecated_finders (~> 1.0.2)
       activesupport (= 4.0.8)
       arel (~> 4.0.0)
-    activerecord-deprecated_finders (1.0.3)
+    activerecord-deprecated_finders (1.0.4)
     activesupport (4.0.8)
       i18n (~> 0.6, >= 0.6.9)
       minitest (~> 4.2)
@@ -115,11 +126,8 @@ PLATFORMS
 
 DEPENDENCIES
   active_attr!
-  activemodel (~> 4)
-  activerecord (~> 4)
-  activesupport (~> 4)
   bundler
-  exception_helper
+  cassandra_datum!
   factory_girl
   jeweler
   pry
