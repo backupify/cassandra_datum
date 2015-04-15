@@ -8,8 +8,7 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
-require 'test/unit'
-require 'shoulda'
+require 'minitest/autorun'
 require 'factory_girl'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -22,8 +21,18 @@ require 'cassandra_datum/test_helper'
 
 I18n.enforce_available_locales = false
 
-class Test::Unit::TestCase
-  include CassandraDatum::TestHelper
+module CassandraDatum
+  class TestCase < MiniTest::Spec
+    include CassandraDatum::TestHelper
+
+    # make minitest spec dsl similar to shoulda
+    class << self
+      alias :setup :before
+      alias :teardown :after
+      alias :context :describe
+      alias :should :it
+    end
+  end
 end
 
 class MockCassandraDatum < CassandraDatum::Base
@@ -96,7 +105,6 @@ module MockCassandraDatumObserver
   def self.reset_before_save_counts!
     @@before_save_counts = {}
   end
-
 end
 
 FactoryGirl.define do
@@ -112,5 +120,4 @@ FactoryGirl.define do
 
   factory :datum_with_array_and_hash, :class => DatumWithArrayAndHash, :parent => :cassandra_datum do
   end
-
 end

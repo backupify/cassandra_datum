@@ -1,7 +1,7 @@
-require File.expand_path(File.dirname(__FILE__) + '/helper.rb')
+require "test_helper"
 
 module CassandraDatum
-  class BaseTest < Test::Unit::TestCase
+  class BaseTest < TestCase
 
     should 'use timestamp long in column_name' do
       time = DateTime.now
@@ -87,9 +87,7 @@ module CassandraDatum
 
       should 'strip invalid characters when encoding to UTF-8' do
         datum = FactoryGirl.build(:cassandra_datum, :payload => "my payload\xEF")
-
-        assert_nothing_raised { datum.save! }
-
+        datum.save!
         fetched_datum = MockCassandraDatum.find(datum.key)
         assert_equal 'my payload', fetched_datum.payload
       end
