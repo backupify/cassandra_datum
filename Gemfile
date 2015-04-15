@@ -11,6 +11,7 @@ group :development do
   gem "factory_girl"
   gem "jeweler"
   gem "minitest"
+  gem "mocha"
   gem "pry"
   gem "rdoc"
 end

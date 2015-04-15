@@ -13,6 +13,7 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 require 'minitest/autorun'
+require 'mocha/setup'
 require 'factory_girl'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
