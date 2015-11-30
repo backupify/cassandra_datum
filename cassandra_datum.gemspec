@@ -24,5 +24,5 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency(%q<activerecord>, [">= 2.3.5"])
   gem.add_runtime_dependency(%q<twitter_cassandra>, [">= 0"])
   gem.add_runtime_dependency(%q<active_attr>, [">= 0"])
-  gem.add_runtime_dependency(%q<exception_helper>, [">= 0"])
+  gem.add_runtime_dependency(%q<backupify-support>, [">= 0"])
 end
