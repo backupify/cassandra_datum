@@ -1,4 +1,4 @@
-require 'exception_helper/retry'
+require 'backupify/exception_helper'
 
 module CassandraDatum
   module CassandraRetry
@@ -22,7 +22,8 @@ module CassandraDatum
     end
 
     def self.included(base)
-      base.send(:include, ExceptionHelper::Retry)
+      base.extend(Backupify::ExceptionHelper)
+      base.send(:include, Backupify::ExceptionHelper)
       base.extend(ClassMethods)
     end
 
