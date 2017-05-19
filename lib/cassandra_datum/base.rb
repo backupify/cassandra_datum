@@ -39,7 +39,7 @@ class Base
   def initialize_with_utf8_encoding(*attr)
     if attr.size > 0 && attr.first.is_a?(Hash)
       #careful not to trounce timestamps in TwitterCassandra::OrderedHash
-      timestamps = attr.first.is_a?(TwitterCassandra::OrderedHash) ? attr.first.timestamps : nil
+      timestamps = attr.first.respond_to?(:timestamps) ? attr.first.timestamps : nil
       attr.first.each { |k, v| attr.first[k] = encode_value(v) unless v.blank? }
       attr.first.instance_variable_set(:@timestamps, timestamps) if timestamps.present?
     end
