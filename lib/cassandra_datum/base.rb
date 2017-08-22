@@ -2,7 +2,6 @@ require 'active_attr/model'
 require 'active_model/callbacks'
 require 'active_record/errors'
 require 'active_record/validations'
-require 'twitter_cassandra'
 require 'cassandra_datum/cassandra_retry'
 
 module CassandraDatum
