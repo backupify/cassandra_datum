@@ -5,10 +5,25 @@
 
 ## Test setup
 
-Do this in cassandra-cli:
+Updated for environments using a dockerized cassandra version:
+Connect to docker instance and start cqlsh to create the test keyspace:
+```
+docker exec -i -t cass1 sh -c 'exec cqlsh 127.0.0.1'
+```
+from cqlsh:
+```
+CREATE KEYSPACE IF NOT EXISTS BackupifyMetadata_test WITH REPLICATION = { 'class': 'SimpleStrategy', 'replication_factor' : 3 };
+```
+
+Then these old commands should work from cassandra-cli, but they should be updated to work from cqlsh as we upgrade cass-
+to get to cassandra-cli, `exit` from cqlsh and run:
+```
+docker exec -i -t cass1 sh -c 'exec cassandra-cli'
+```
+Then use the old commands to use the keyspace and create the column family for tests
 
 ```
-use BackupifyMetadata_test; # create it first if it doesn't exist
+use BackupifyMetadata_test;
 create column family MockCassandraData with column_type='Super' and comparator='com.backupify.db.DatumType' and subcomparator='UTF8Type';
 ```
 
