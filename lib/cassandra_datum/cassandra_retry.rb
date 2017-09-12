@@ -2,8 +2,8 @@ require 'exception_helper/retry'
 
 module CassandraDatum
   module Exceptions
-    unless Object.const_defined?('::Thrift::Exception')
-      class ::Thrift::Exception < StandardError
+    unless Object.const_defined?('::Cassandra::Error')
+      class Cassandra::Error < StandardError
         def initialize(message)
           super
           @message = message
@@ -34,20 +34,24 @@ module CassandraDatum
     # end
 
     unless Object.const_defined?('::ThriftClient::NoServersAvailable')
-      class ::ThriftClient::NoServersAvailable < Thrift::Exception
+      class ::ThriftClient::NoServersAvailable < Cassandra::Error
       end
     end
 
     unless Object.const_defined?('::CassandraThrift::TimedOutException')
-      class ::CassandraThrift::TimedOutException < Thrift::Exception
+      class ::CassandraThrift::TimedOutException < Cassandra::Error
       end
     end
   end
 
   module CassandraRetry
     CASSANDRA_EXCEPTIONS = [
-      ::Thrift::Exception,
-      ::ThriftClient::NoServersAvailable,
+        ::Cassandra::Errors::NoHostsAvailable,
+        ::Cassandra::Errors::UnavailableError,
+        ::Cassandra::Errors::TimeoutError,
+        ::Cassandra::Errors::ReadTimeoutError,
+        ::Cassandra::Errors::WriteTimeoutError,
+        ::Cassandra::Error, ThreadError,
     ].freeze
 
     class << self

@@ -6,8 +6,8 @@ namespace :cassandra do
   task :reset do
     begin
       Rake::Task['cassandra:drop'].invoke
-    rescue Thrift::Exception => e
-      puts "ignoring thrift exception #{e} (keyspace probably doesn't exist)"
+    rescue ::Cassandra::Error => e
+      puts "ignoring cassandra exception #{e} (keyspace probably doesn't exist)"
     end
 
     Rake::Task['cassandra:create'].invoke
@@ -25,9 +25,9 @@ namespace :cassandra do
         client.drop_keyspace keyspace_name
       end
 
-    rescue Thrift::Exception => e
+    rescue ::Cassandra::Error => e
       if ENV['IGNORE_THRIFT_EXCEPTIONS']
-        puts "ignoring thrift exception #{e}"
+        puts "ignoring cassandra exception #{e}"
       else
         raise e
       end
@@ -54,9 +54,9 @@ namespace :cassandra do
         client.add_keyspace keyspace_definition
       end
 
-    rescue Thrift::Exception => e
+    rescue ::Cassandra::Error => e
       if ENV['IGNORE_THRIFT_EXCEPTIONS']
-        puts "ignoring thrift exception #{e}"
+        puts "ignoring cassandra exception #{e}"
       else
         raise e
       end
@@ -100,9 +100,9 @@ namespace :cassandra do
 
       end
 
-    rescue Thrift::Exception => e
+    rescue ::Cassandra::Error => e
       if ENV['IGNORE_THRIFT_EXCEPTIONS']
-        puts "ignoring thrift exception #{e}"
+        puts "ignoring cassandra exception #{e}"
       else
         raise e
       end
