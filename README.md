@@ -27,6 +27,8 @@ use BackupifyMetadata_test;
 create column family MockCassandraData with column_type='Super' and comparator='com.backupify.db.DatumType' and subcomparator='UTF8Type';
 ```
 
+Then you should be able to `bundle exec rake`
+
 ## Copyright
 
 Copyright (c) 2012 Jason Haruska. See LICENSE.txt for further details.
