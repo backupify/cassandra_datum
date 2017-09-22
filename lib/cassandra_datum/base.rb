@@ -47,8 +47,11 @@ class Base
     initialize_without_utf8_encoding(*attr)
   end
 
-  alias_method_chain :initialize, :updated_at
-  alias_method_chain :initialize, :utf8_encoding
+  alias_method :initialize_without_updated_at, :initialize
+  alias_method :initialize, :initialize_with_updated_at
+
+  alias_method :initialize_without_utf8_encoding, :initialize
+  alias_method :initialize, :initialize_with_utf8_encoding
 
   def self.create(*attr)
     new(*attr).tap(&:save!)
