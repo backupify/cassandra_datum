@@ -19,9 +19,9 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_runtime_dependency(%q<activesupport>, [">= 2.3.5"])
-  gem.add_runtime_dependency(%q<activemodel>, [">= 2.3.5"])
-  gem.add_runtime_dependency(%q<activerecord>, [">= 2.3.5"])
+  gem.add_runtime_dependency(%q<activesupport>, ["<= 5.2.0"])
+  gem.add_runtime_dependency(%q<activemodel>, ["<= 5.2.0"])
+  gem.add_runtime_dependency(%q<activerecord>, ["<= 5.2.0"])
   gem.add_runtime_dependency(%q<twitter_cassandra>, [">= 0"])
   gem.add_runtime_dependency(%q<active_attr>, [">= 0"])
   gem.add_runtime_dependency(%q<exception_helper>, [">= 0"])
